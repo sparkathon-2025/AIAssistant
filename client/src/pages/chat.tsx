@@ -105,6 +105,15 @@ export default function Chat() {
     }
   }, [transcript]);
 
+  // Auto-resize textarea on message change
+  useEffect(() => {
+    if (textareaRef.current) {
+      const textarea = textareaRef.current;
+      textarea.style.height = "auto";
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    }
+  }, [inputMessage]);
+
   // Voice command handlers
   const toggleListening = () => {
     if (isListening) {
@@ -153,10 +162,19 @@ export default function Chat() {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputMessage(e.target.value);
+    
+    // Auto-resize textarea
+    const textarea = e.currentTarget;
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      handleSubmit(e as any);
     }
   };
 
@@ -347,10 +365,10 @@ export default function Chat() {
               <Textarea
                 ref={textareaRef}
                 value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
+                onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder={isListening ? "Listening... speak now" : "Type your message here..."}
-                className={`resize-none border rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm min-h-[44px] max-h-[120px] ${
+                className={`resize-none border rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm min-h-[44px] max-h-[120px] overflow-hidden ${
                   isListening 
                     ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/10' 
                     : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
@@ -358,6 +376,7 @@ export default function Chat() {
                 rows={1}
                 maxLength={1000}
                 disabled={sendMessageMutation.isPending}
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               />
               
               {/* Character limit indicator */}
