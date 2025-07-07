@@ -96,6 +96,7 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 
 ## Changelog
 - July 07, 2025. Initial setup
+- July 07, 2025. Added dark mode functionality with theme toggle button
 
 ## User Preferences
 
