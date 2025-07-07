@@ -24,8 +24,14 @@ export async function generateChatResponse(userMessage: string): Promise<string>
     });
 
     return response.choices[0].message.content || "I apologize, but I couldn't generate a response at this time. Please try again.";
-  } catch (error) {
+  } catch (error: any) {
     console.error("OpenAI API error:", error);
+    
+    // Handle quota exceeded error specifically
+    if (error?.code === 'insufficient_quota' || error?.status === 429) {
+      return "⚠️ OpenAI API quota exceeded. To use this chatbot, you'll need to:\n\n1. Visit https://platform.openai.com/billing\n2. Add a payment method to your OpenAI account\n3. Purchase credits (starting at $5)\n\nThe API requires payment to access GPT-4o, even with a valid API key. This chatbot interface is fully functional and ready to work once you have an active billing account with OpenAI.";
+    }
+    
     throw new Error("Failed to generate AI response. Please check your API configuration and try again.");
   }
 }
