@@ -1,8 +1,47 @@
-import { messages, type Message, type InsertMessage } from "@shared/schema";
+import { MessageModel, type Message, type InsertMessage } from "@shared/schema";
+import { connectToDatabase } from "./db";
 
 export interface IStorage {
   getMessages(): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
+}
+
+export class DatabaseStorage implements IStorage {
+  async getMessages(): Promise<Message[]> {
+    await connectToDatabase();
+    
+    const messages = await MessageModel.find()
+      .sort({ timestamp: 1 })
+      .lean();
+    
+    return messages.map(msg => ({
+      _id: (msg._id as any).toString(),
+      id: (msg._id as any).toString(), // For frontend compatibility
+      content: msg.content,
+      sender: msg.sender as 'user' | 'ai',
+      timestamp: msg.timestamp,
+    }));
+  }
+
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    await connectToDatabase();
+    
+    const message = new MessageModel({
+      content: insertMessage.content,
+      sender: insertMessage.sender,
+      timestamp: new Date(),
+    });
+    
+    const savedMessage = await message.save();
+    
+    return {
+      _id: savedMessage._id.toString(),
+      id: savedMessage._id.toString(), // For frontend compatibility
+      content: savedMessage.content,
+      sender: savedMessage.sender,
+      timestamp: savedMessage.timestamp,
+    };
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -24,7 +63,8 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const message: Message = { 
       ...insertMessage, 
-      id, 
+      _id: id.toString(),
+      id: id.toString(),
       timestamp: new Date()
     };
     this.messages.set(id, message);
@@ -32,4 +72,5 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Use DatabaseStorage for MongoDB
+export const storage = new DatabaseStorage();

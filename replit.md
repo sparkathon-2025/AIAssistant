@@ -24,10 +24,10 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 ## Key Components
 
 ### Database & Storage
-- **ORM**: Drizzle ORM configured for PostgreSQL
-- **Current Storage**: In-memory storage implementation (MemStorage)
-- **Schema**: Defined in shared/schema.ts with users and messages tables
-- **Migration**: Drizzle Kit for database migrations
+- **Database**: MongoDB with Mongoose ODM
+- **Current Storage**: MongoDB database storage (DatabaseStorage)
+- **Schema**: Defined in shared/schema.ts with users and messages collections
+- **Connection**: Local MongoDB instance running on port 27017
 
 ### Authentication & Authorization
 - Currently not implemented but database schema includes users table for future implementation
@@ -62,11 +62,10 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - **Date Handling**: date-fns for date formatting
 
 ### Backend Dependencies
-- **Database**: Neon Database serverless PostgreSQL
-- **ORM**: Drizzle ORM with Drizzle-Zod for validation
-- **AI**: OpenAI API client
-- **Session**: PostgreSQL session store (connect-pg-simple)
+- **Database**: MongoDB with Mongoose ODM
 - **Validation**: Zod for runtime type checking
+- **AI**: OpenAI API client
+- **Connection**: MongoDB connection management with caching
 
 ### Development Tools
 - **TypeScript**: Strict type checking across the stack
@@ -89,14 +88,15 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - Environment-based configuration switching
 
 ### Database Strategy
-- Drizzle configuration for PostgreSQL connection
-- Environment variable based database URL
-- Migration system using Drizzle Kit
-- Prepared for easy PostgreSQL integration (currently using in-memory storage)
+- MongoDB connection with Mongoose ODM
+- Environment variable based MongoDB URI
+- Automatic connection caching for development
+- Local MongoDB instance for development and testing
 
 ## Changelog
 - July 07, 2025. Initial setup
 - July 07, 2025. Added dark mode functionality with theme toggle button
+- July 07, 2025. Integrated MongoDB database with Mongoose ODM
 
 ## User Preferences
 
