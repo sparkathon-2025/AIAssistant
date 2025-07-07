@@ -5,17 +5,37 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Moon, Sun } from "lucide-react";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
+import { Moon, Sun, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import type { Message } from "@shared/schema";
 
 export default function Chat() {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { theme, toggleTheme } = useTheme();
+  
+  // Voice functionality
+  const { 
+    isListening, 
+    transcript, 
+    isSupported: speechRecognitionSupported, 
+    startListening, 
+    stopListening, 
+    resetTranscript 
+  } = useSpeechRecognition();
+  
+  const { 
+    speak, 
+    stop: stopSpeaking, 
+    isSpeaking, 
+    isSupported: speechSynthesisSupported 
+  } = useSpeechSynthesis();
 
   // Fetch messages
   const { data: messages = [], isLoading } = useQuery<Message[]>({
@@ -31,11 +51,17 @@ export default function Chat() {
     onMutate: () => {
       setIsTyping(true);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
       setInputMessage("");
+      resetTranscript();
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
+      }
+      
+      // Auto-speak AI response if enabled
+      if (autoSpeak && data.aiMessage?.content) {
+        speak(data.aiMessage.content);
       }
     },
     onError: (error) => {
@@ -62,6 +88,29 @@ export default function Chat() {
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   }, [inputMessage]);
+
+  // Handle voice transcript
+  useEffect(() => {
+    if (transcript) {
+      setInputMessage(transcript);
+    }
+  }, [transcript]);
+
+  // Voice command handlers
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  const toggleAutoSpeak = () => {
+    if (isSpeaking) {
+      stopSpeaking();
+    }
+    setAutoSpeak(!autoSpeak);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +155,47 @@ export default function Chat() {
           </div>
         </div>
         <div className="flex items-center space-x-3">
+          {/* Voice Controls */}
+          {speechSynthesisSupported && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleAutoSpeak}
+              className={`p-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                autoSpeak 
+                  ? 'bg-primary/10 dark:bg-primary/10 border-primary/30' 
+                  : 'bg-white dark:bg-gray-800'
+              }`}
+              title={autoSpeak ? "Disable voice responses" : "Enable voice responses"}
+            >
+              {autoSpeak ? (
+                <Volume2 className={`h-4 w-4 ${isSpeaking ? 'text-primary animate-pulse' : 'text-primary'}`} />
+              ) : (
+                <VolumeX className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+              )}
+            </Button>
+          )}
+          
+          {speechRecognitionSupported && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleListening}
+              className={`p-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                isListening 
+                  ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' 
+                  : 'bg-white dark:bg-gray-800'
+              }`}
+              title={isListening ? "Stop listening" : "Start voice input"}
+            >
+              {isListening ? (
+                <MicOff className="h-4 w-4 text-red-600 dark:text-red-400 animate-pulse" />
+              ) : (
+                <Mic className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+              )}
+            </Button>
+          )}
+          
           <Button
             variant="outline"
             size="sm"
@@ -118,6 +208,7 @@ export default function Chat() {
               <Sun className="h-4 w-4 text-gray-700 dark:text-gray-300" />
             )}
           </Button>
+          
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-400 rounded-full"></div>
             <span className="text-sm text-text-secondary dark:text-gray-400">Online</span>
@@ -133,6 +224,16 @@ export default function Chat() {
             <div className="inline-block bg-chat-bg dark:bg-gray-800 rounded-lg px-4 py-2 mb-2">
               <p className="text-sm text-text-secondary dark:text-gray-400">👋 Welcome! I'm your AI assistant. How can I help you today?</p>
             </div>
+            {(speechRecognitionSupported || speechSynthesisSupported) && (
+              <div className="mt-3 space-y-1 text-xs text-text-secondary dark:text-gray-500">
+                {speechRecognitionSupported && (
+                  <p>🎤 Click the microphone to use voice input</p>
+                )}
+                {speechSynthesisSupported && (
+                  <p>🔊 Click the speaker to enable voice responses</p>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -205,8 +306,12 @@ export default function Chat() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type your message here..."
-              className="resize-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm min-h-[44px] max-h-[120px]"
+              placeholder={isListening ? "Listening... speak now" : "Type your message here..."}
+              className={`resize-none border rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm min-h-[44px] max-h-[120px] ${
+                isListening 
+                  ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/10' 
+                  : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+              } text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400`}
               rows={1}
               maxLength={1000}
               disabled={sendMessageMutation.isPending}

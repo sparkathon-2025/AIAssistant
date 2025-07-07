@@ -72,5 +72,5 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use DatabaseStorage for MongoDB
-export const storage = new DatabaseStorage();
+// Use MemStorage for now to avoid connection issues
+export const storage = new MemStorage();

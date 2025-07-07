@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb://localhost:27017/ai-chatbot';
+// Check if DATABASE_URL is a PostgreSQL URL and ignore it for MongoDB
+const isPostgresUrl = process.env.DATABASE_URL?.includes('postgres');
+const MONGODB_URI = process.env.MONGODB_URI || (!isPostgresUrl ? process.env.DATABASE_URL : null) || 'mongodb://localhost:27017/ai-chatbot';
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');

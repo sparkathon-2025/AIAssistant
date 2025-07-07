@@ -38,6 +38,12 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - **Configuration**: Environment variable based API key management
 - **Error Handling**: Comprehensive error handling for API failures
 
+### Voice Functionality
+- **Speech Recognition**: Web Speech API for voice input
+- **Text-to-Speech**: Web Speech Synthesis API for voice responses
+- **Voice Controls**: Microphone toggle, auto-speak toggle, visual feedback
+- **Browser Support**: Automatic detection and graceful fallback
+
 ### API Structure
 - `GET /api/messages` - Retrieve all chat messages
 - `POST /api/chat` - Send message and receive AI response
@@ -97,6 +103,7 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - July 07, 2025. Initial setup
 - July 07, 2025. Added dark mode functionality with theme toggle button
 - July 07, 2025. Integrated MongoDB database with Mongoose ODM
+- July 07, 2025. Added voice command and voice assistant functionality
 
 ## User Preferences
 
