@@ -10,6 +10,7 @@ import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { QRScanner } from "@/components/QRScanner";
 import { ImageUpload } from "@/components/ImageUpload";
+import { QRTest } from "@/components/QRTest";
 import { Moon, Sun, Mic, MicOff, Volume2, VolumeX, QrCode, Image as ImageIcon, Paperclip } from "lucide-react";
 import type { Message } from "@shared/schema";
 
@@ -266,6 +267,7 @@ export default function Chat() {
               )}
               <p>📷 Click the image icon to upload photos for analysis</p>
               <p>📱 Click the QR code icon to scan QR codes</p>
+              <p className="text-xs text-gray-400">Note: QR scanning requires camera permissions</p>
             </div>
           </div>
         )}

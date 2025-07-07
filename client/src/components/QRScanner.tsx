@@ -41,6 +41,9 @@ export const QRScanner = ({ onScanResult, onClose }: QRScannerProps) => {
         {error && (
           <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-xs text-red-500 dark:text-red-300 mt-1">
+              Make sure to allow camera access when prompted by your browser.
+            </p>
           </div>
         )}
 
@@ -88,7 +91,7 @@ export const QRScanner = ({ onScanResult, onClose }: QRScannerProps) => {
             </div>
 
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-              Position the QR code within the camera view
+              Position the QR code within the camera view. Make sure it's well-lit and clear.
             </p>
           </>
         )}
