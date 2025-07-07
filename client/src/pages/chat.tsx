@@ -7,13 +7,19 @@ import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
-import { Moon, Sun, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { QRScanner } from "@/components/QRScanner";
+import { ImageUpload } from "@/components/ImageUpload";
+import { Moon, Sun, Mic, MicOff, Volume2, VolumeX, QrCode, Image as ImageIcon, Paperclip } from "lucide-react";
 import type { Message } from "@shared/schema";
 
 export default function Chat() {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [showImageUpload, setShowImageUpload] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<Array<{ file: File; preview: string; base64: string }>>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
@@ -55,6 +61,8 @@ export default function Chat() {
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
       setInputMessage("");
       resetTranscript();
+      setUploadedImages([]);
+      setShowImageUpload(false);
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
@@ -116,7 +124,32 @@ export default function Chat() {
     e.preventDefault();
     const message = inputMessage.trim();
     if (!message || sendMessageMutation.isPending) return;
-    sendMessageMutation.mutate(message);
+    
+    // Include image context if images are uploaded
+    let messageWithContext = message;
+    if (uploadedImages.length > 0) {
+      messageWithContext = `${message}\n\n[User has uploaded ${uploadedImages.length} image(s) for analysis]`;
+    }
+    
+    sendMessageMutation.mutate(messageWithContext);
+  };
+
+  const handleQRResult = (result: string) => {
+    setInputMessage(prev => prev + (prev ? '\n' : '') + `QR Code: ${result}`);
+    toast({
+      title: "QR Code Scanned",
+      description: "QR code content added to message",
+    });
+  };
+
+  const handleImagesUploaded = (images: Array<{ file: File; preview: string; base64: string }>) => {
+    setUploadedImages(images);
+    if (images.length > 0) {
+      toast({
+        title: "Images Uploaded",
+        description: `${images.length} image(s) ready for analysis`,
+      });
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -224,16 +257,16 @@ export default function Chat() {
             <div className="inline-block bg-chat-bg dark:bg-gray-800 rounded-lg px-4 py-2 mb-2">
               <p className="text-sm text-text-secondary dark:text-gray-400">👋 Welcome! I'm your AI assistant. How can I help you today?</p>
             </div>
-            {(speechRecognitionSupported || speechSynthesisSupported) && (
-              <div className="mt-3 space-y-1 text-xs text-text-secondary dark:text-gray-500">
-                {speechRecognitionSupported && (
-                  <p>🎤 Click the microphone to use voice input</p>
-                )}
-                {speechSynthesisSupported && (
-                  <p>🔊 Click the speaker to enable voice responses</p>
-                )}
-              </div>
-            )}
+            <div className="mt-3 space-y-1 text-xs text-text-secondary dark:text-gray-500">
+              {speechRecognitionSupported && (
+                <p>🎤 Click the microphone to use voice input</p>
+              )}
+              {speechSynthesisSupported && (
+                <p>🔊 Click the speaker to enable voice responses</p>
+              )}
+              <p>📷 Click the image icon to upload photos for analysis</p>
+              <p>📱 Click the QR code icon to scan QR codes</p>
+            </div>
           </div>
         )}
 
@@ -299,41 +332,83 @@ export default function Chat() {
 
       {/* Message Input */}
       <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-3">
-        <form onSubmit={handleSubmit} className="flex items-end space-x-3">
-          <div className="flex-1 relative">
-            <Textarea
-              ref={textareaRef}
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={isListening ? "Listening... speak now" : "Type your message here..."}
-              className={`resize-none border rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm min-h-[44px] max-h-[120px] ${
-                isListening 
-                  ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/10' 
-                  : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
-              } text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400`}
-              rows={1}
-              maxLength={1000}
-              disabled={sendMessageMutation.isPending}
-            />
-            
-            {/* Character limit indicator */}
-            <div className="absolute bottom-2 right-3 text-xs text-text-secondary dark:text-gray-400">
-              <span>{inputMessage.length}</span>/1000
+        <form onSubmit={handleSubmit} className="space-y-3">
+          {/* Image Upload Area */}
+          {showImageUpload && (
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+              <ImageUpload onImagesUploaded={handleImagesUploaded} />
             </div>
-          </div>
+          )}
+
+          <div className="flex items-end space-x-3">
+            <div className="flex-1 relative">
+              <Textarea
+                ref={textareaRef}
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={isListening ? "Listening... speak now" : "Type your message here..."}
+                className={`resize-none border rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm min-h-[44px] max-h-[120px] ${
+                  isListening 
+                    ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/10' 
+                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                } text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400`}
+                rows={1}
+                maxLength={1000}
+                disabled={sendMessageMutation.isPending}
+              />
+              
+              {/* Character limit indicator */}
+              <div className="absolute bottom-2 right-3 text-xs text-text-secondary dark:text-gray-400">
+                <span>{inputMessage.length}</span>/1000
+              </div>
+            </div>
+            
+            {/* Upload Controls */}
+            <div className="flex space-x-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowQRScanner(true)}
+                className="p-2"
+                title="Scan QR Code"
+              >
+                <QrCode className="h-4 w-4" />
+              </Button>
+              
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowImageUpload(!showImageUpload)}
+                className={`p-2 ${showImageUpload ? 'bg-primary/10 border-primary/30' : ''}`}
+                title="Upload Images"
+              >
+                <ImageIcon className="h-4 w-4" />
+              </Button>
+            </div>
           
-          <Button 
-            type="submit" 
-            disabled={!inputMessage.trim() || sendMessageMutation.isPending || inputMessage.length > 1000}
-            className="bg-primary hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg px-4 py-3 transition-all duration-200 flex items-center justify-center h-[44px]"
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-            </svg>
-          </Button>
+            <Button 
+              type="submit" 
+              disabled={!inputMessage.trim() || sendMessageMutation.isPending || inputMessage.length > 1000}
+              className="bg-primary hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg px-4 py-3 transition-all duration-200 flex items-center justify-center h-[44px]"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+              </svg>
+            </Button>
+          </div>
         </form>
       </div>
+
+      {/* QR Scanner Modal */}
+      {showQRScanner && (
+        <QRScanner
+          onScanResult={handleQRResult}
+          onClose={() => setShowQRScanner(false)}
+        />
+      )}
     </div>
   );
 }

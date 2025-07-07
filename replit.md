@@ -44,6 +44,12 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - **Voice Controls**: Microphone toggle, auto-speak toggle, visual feedback
 - **Browser Support**: Automatic detection and graceful fallback
 
+### Visual Input Features
+- **QR Code Scanning**: Camera-based QR code detection using jsQR library
+- **Photo Upload**: Multi-image upload with preview and analysis capability
+- **Image Processing**: Base64 encoding for AI analysis
+- **Visual Feedback**: Real-time camera preview and upload status
+
 ### API Structure
 - `GET /api/messages` - Retrieve all chat messages
 - `POST /api/chat` - Send message and receive AI response
@@ -104,6 +110,7 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - July 07, 2025. Added dark mode functionality with theme toggle button
 - July 07, 2025. Integrated MongoDB database with Mongoose ODM
 - July 07, 2025. Added voice command and voice assistant functionality
+- July 07, 2025. Implemented QR code scanning and image upload capabilities
 
 ## User Preferences
 
