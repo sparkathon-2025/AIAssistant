@@ -311,12 +311,12 @@ export default function AICall() {
                         {isRecording ? (
                           <>
                             <MicOff className="w-5 h-5 mr-2" />
-                            Stop Recording
+                            Stop Query
                           </>
                         ) : (
                           <>
                             <Mic className="w-5 h-5 mr-2" />
-                            {isProcessing ? 'Processing...' : 'Record Query'}
+                            {isProcessing ? 'Processing...' : 'Start Query'}
                           </>
                         )}
                       </Button>
