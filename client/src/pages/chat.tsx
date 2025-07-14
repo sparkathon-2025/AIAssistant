@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,11 +22,16 @@ export default function Chat() {
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<Array<{ file: File; preview: string; base64: string }>>([]);
+  const [location] = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { theme, toggleTheme } = useTheme();
+
+  // Extract product ID from URL query parameters
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const productId = urlParams.get('productId');
   
   // Voice functionality
   const { 
@@ -114,6 +120,24 @@ export default function Chat() {
     }
   }, [inputMessage]);
 
+  // Handle product ID from URL parameters
+  useEffect(() => {
+    if (productId && !sendMessageMutation.isPending) {
+      const productInfoMessage = `Please provide information about product ID: ${productId}`;
+      setInputMessage(productInfoMessage);
+      
+      toast({
+        title: "Product Scanned",
+        description: "Getting product information...",
+      });
+      
+      // Auto-send the message after a short delay
+      setTimeout(() => {
+        sendMessageMutation.mutate(productInfoMessage);
+      }, 1000);
+    }
+  }, [productId, sendMessageMutation]);
+
   // Voice command handlers
   const toggleListening = () => {
     if (isListening) {
@@ -145,10 +169,30 @@ export default function Chat() {
   };
 
   const handleQRResult = (result: string) => {
-    setInputMessage(prev => prev + (prev ? '\n' : '') + `QR Code: ${result}`);
+    // Extract product ID from QR code result
+    let productId = result;
+    
+    // If it's a URL, try to extract ID from it
+    if (result.includes('product') || result.includes('id=')) {
+      const urlMatch = result.match(/id=([^&]+)/);
+      if (urlMatch) {
+        productId = urlMatch[1];
+      } else {
+        // Try to extract from path
+        const pathMatch = result.match(/\/product\/([^\/\?]+)/);
+        if (pathMatch) {
+          productId = pathMatch[1];
+        }
+      }
+    }
+    
+    // Send message requesting product information
+    const productInfoMessage = `Please provide information about product ID: ${productId}`;
+    setInputMessage(productInfoMessage);
+    
     toast({
       title: "QR Code Scanned",
-      description: "QR code content added to message",
+      description: "Product information request prepared",
     });
   };
 
@@ -192,7 +236,7 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex flex-col h-screen w-full mx-auto bg-white dark:bg-gray-900 shadow-xl">
+    <div className="flex flex-col h-screen max-w-4xl mx-auto bg-white dark:bg-gray-900 shadow-xl">
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-3">
@@ -202,8 +246,12 @@ export default function Chat() {
             </svg>
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-text-primary dark:text-white">AI Assistant</h1>
-            <p className="text-sm text-text-secondary dark:text-gray-400">Always here to help</p>
+            <h1 className="text-lg font-semibold text-text-primary dark:text-white">
+              {productId ? 'Product Assistant' : 'AI Assistant'}
+            </h1>
+            <p className="text-sm text-text-secondary dark:text-gray-400">
+              {productId ? `Product ID: ${productId}` : 'Always here to help'}
+            </p>
           </div>
         </div>
         <div className="flex items-center space-x-3">
@@ -284,7 +332,7 @@ export default function Chat() {
                 <p>🔊 Click the speaker to enable voice responses</p>
               )}
               <p>📷 Click the image icon to upload photos for analysis</p>
-              <p>📱 Click the QR code icon to scan QR codes</p>
+              <p>📱 Click the QR code icon to scan product QR codes</p>
               <p className="text-xs text-gray-400">Note: QR scanning requires camera permissions</p>
             </div>
           </div>

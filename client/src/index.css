@@ -51,6 +51,9 @@
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(240, 4.9%, 83.9%);
   --radius: 0.5rem;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --muted-foreground: 240 5% 64.9%;
   
   /* Custom chat colors for dark mode */
   --chat-bg: hsl(240, 3.7%, 15.9%);

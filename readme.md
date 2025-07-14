@@ -56,6 +56,13 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - Input validation using Zod schemas
 - Consistent error response format
 
+### Application Flow
+1. **Landing Page**: Users start at QR scanner landing page (`/`)
+2. **QR Scanning**: Scan product QR codes to extract product IDs
+3. **Product Chat**: Navigate to chat with `?productId=` parameter
+4. **Auto-Query**: Automatically request product information on load
+5. **Interactive Chat**: Continue conversation about the product
+
 ## Data Flow
 
 1. **Message Sending**: User inputs message → Frontend validates → API call to `/api/chat`
@@ -111,6 +118,7 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - July 07, 2025. Integrated MongoDB database with Mongoose ODM
 - July 07, 2025. Added voice command and voice assistant functionality
 - July 07, 2025. Implemented QR code scanning and image upload capabilities
+- July 07, 2025. Added QR landing page as entry point with product ID flow
 
 ## User Preferences
 

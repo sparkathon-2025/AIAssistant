@@ -1,6 +1,7 @@
 import { useQRScanner } from '@/hooks/useQRScanner';
 import { Button } from '@/components/ui/button';
 import { X, Camera, QrCode } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface QRScannerProps {
   onScanResult: (result: string) => void;
@@ -22,6 +23,11 @@ export const QRScanner = ({ onScanResult, onClose }: QRScannerProps) => {
     onScanResult(result);
     onClose();
   };
+  
+  useEffect(() => {
+    startScanning();
+    return () => stopScanning();
+  }, [startScanning, stopScanning]);
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
