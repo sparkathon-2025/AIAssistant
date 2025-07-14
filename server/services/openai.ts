@@ -2,8 +2,16 @@ import OpenAI from "openai";
 import "dotenv/config"
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+const apiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR;
+
+console.log('OpenAI API Key available:', apiKey ? 'Yes' : 'No');
+
+if (!apiKey) {
+  console.error('No OpenAI API key found in environment variables');
+}
+
 const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
+  apiKey: apiKey || "sk-dummy-key-for-development"
 });
 
 export async function generateChatResponse(userMessage: string): Promise<string> {
