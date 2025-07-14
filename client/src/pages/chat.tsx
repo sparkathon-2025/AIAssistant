@@ -12,9 +12,10 @@ import { useImageUpload } from "@/hooks/useImageUpload";
 import { QRScanner } from "@/components/QRScanner";
 import { ImageUpload } from "@/components/ImageUpload";
 import { QRTest } from "@/components/QRTest";
-import { Moon, Sun, Mic, MicOff, Volume2, VolumeX, QrCode, Image as ImageIcon, Paperclip } from "lucide-react";
+import { Moon, Sun, Mic, MicOff, Volume2, VolumeX, QrCode, Image as ImageIcon, Paperclip, PhoneCall } from "lucide-react";
 import type { Message } from "@shared/schema";
 import ProductInfo from "@/components/ui/productInfo";
+import { navigate } from "wouter/use-browser-location";
 
 export default function Chat() {
   const dummy = {
@@ -271,6 +272,17 @@ export default function Chat() {
         </div>
         <div className="flex items-center space-x-3">
           {/* Voice Controls */}
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/ai-call')}
+            title="Call AI"
+            className="p-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <PhoneCall className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+          </Button>
+
           {speechSynthesisSupported && (
             <Button
               variant="outline"

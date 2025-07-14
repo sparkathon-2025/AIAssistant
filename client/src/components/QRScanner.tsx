@@ -29,6 +29,12 @@ export const QRScanner = ({ onScanResult, onClose }: QRScannerProps) => {
     return () => stopScanning();
   }, [startScanning, stopScanning]);
 
+  useEffect(() => {
+    if (qrResult) {
+      handleScanResult(qrResult);
+    }
+  }, [qrResult]);
+
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-md">
@@ -50,23 +56,6 @@ export const QRScanner = ({ onScanResult, onClose }: QRScannerProps) => {
             <p className="text-xs text-red-500 dark:text-red-300 mt-1">
               Make sure to allow camera access when prompted by your browser.
             </p>
-          </div>
-        )}
-
-        {qrResult && (
-          <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-            <p className="text-sm text-green-800 dark:text-green-400 mb-2">QR Code detected:</p>
-            <p className="text-sm font-mono bg-white dark:bg-gray-800 p-2 rounded border break-all">
-              {qrResult}
-            </p>
-            <div className="flex gap-2 mt-3">
-              <Button size="sm" onClick={() => handleScanResult(qrResult)}>
-                Use Result
-              </Button>
-              <Button variant="outline" size="sm" onClick={resetResult}>
-                Scan Again
-              </Button>
-            </div>
           </div>
         )}
 

@@ -87,14 +87,6 @@ export default function QRLanding() {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Point your camera at a store QR code to get started
             </p>
-            <div className="flex gap-6 justify-center">
-              <Link href="/chat" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">
-                💬 Text Chat
-              </Link>
-              <Link href="/ai-call" className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium text-sm">
-                📞 AI Call
-              </Link>
-            </div>
           </div>
         </CardContent>
       </Card>

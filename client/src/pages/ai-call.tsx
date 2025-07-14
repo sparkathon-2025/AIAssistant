@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { Phone, PhoneCall, PhoneOff, Mic, MicOff, Volume2, VolumeX, Moon, Sun, Home } from "lucide-react";
-import { Link } from "wouter";
+import { navigate } from "wouter/use-browser-location";
 
 export default function AICall() {
   const [isCallActive, setIsCallActive] = useState(false);
@@ -197,9 +197,15 @@ export default function AICall() {
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <Link href="/" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
-            <Home className="w-5 h-5 inline-block mr-1" />
-          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/chat')}
+            title="Home"
+            className="p-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <Home className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+          </Button>
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
             <Phone className="w-4 h-4 text-white" />
           </div>
