@@ -14,8 +14,23 @@ import { ImageUpload } from "@/components/ImageUpload";
 import { QRTest } from "@/components/QRTest";
 import { Moon, Sun, Mic, MicOff, Volume2, VolumeX, QrCode, Image as ImageIcon, Paperclip } from "lucide-react";
 import type { Message } from "@shared/schema";
+import ProductInfo from "@/components/ui/productInfo";
 
 export default function Chat() {
+  const dummy = {
+            "_id": "prod_001",
+            "store_id": "store_001",
+            "product_code": "8901030875224",
+            "name": "Amul Butter",
+            "brand": "Amul",
+            "ingredients": "Pasteurized cream, salt",
+            "price": 55.0,
+            "stock": 25,
+            "variants": ["100g", "500g"],
+            "comparison_tags": ["butter", "dairy", "spread"],
+            "shelf_location": "Aisle 4, Left Side, Shelf 2"
+    };
+
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(false);
@@ -51,7 +66,7 @@ export default function Chat() {
   } = useSpeechSynthesis();
 
   // Fetch messages
-  const { data: messages = [], isLoading } = useQuery<Message[]>({
+  const { data: messages = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/messages"],
   });
 
@@ -351,6 +366,8 @@ export default function Chat() {
                 <div className="flex-1">
                   <div className="bg-chat-bg dark:bg-gray-800 rounded-lg rounded-tl-none px-4 py-3 max-w-xs md:max-w-lg">
                     <p className="text-sm text-text-primary dark:text-white whitespace-pre-wrap">{message.content}</p>
+                    <br />
+                    {message.product_code && <ProductInfo product={dummy} />}
                   </div>
                   <p className="text-xs text-text-secondary dark:text-gray-400 mt-1 ml-1">{formatTime(message.timestamp)}</p>
                 </div>
