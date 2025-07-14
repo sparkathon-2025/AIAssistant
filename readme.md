@@ -43,6 +43,7 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - **Text-to-Speech**: Web Speech Synthesis API for voice responses
 - **Voice Controls**: Microphone toggle, auto-speak toggle, visual feedback
 - **Browser Support**: Automatic detection and graceful fallback
+- **AI Call**: Phone-like interface with OpenAI Whisper and TTS integration
 
 ### Visual Input Features
 - **QR Code Scanning**: Camera-based QR code detection using jsQR library
@@ -53,6 +54,7 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 ### API Structure
 - `GET /api/messages` - Retrieve all chat messages
 - `POST /api/chat` - Send message and receive AI response
+- `POST /api/ai-call` - Process voice queries (audio to audio)
 - Input validation using Zod schemas
 - Consistent error response format
 
@@ -62,6 +64,7 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 3. **Product Chat**: Navigate to chat with `?productId=` parameter
 4. **Auto-Query**: Automatically request product information on load
 5. **Interactive Chat**: Continue conversation about the product
+6. **AI Call**: Phone-like interface for voice queries at `/ai-call`
 
 ## Data Flow
 
@@ -119,6 +122,7 @@ This is a modern full-stack AI chat application built with React frontend and Ex
 - July 07, 2025. Added voice command and voice assistant functionality
 - July 07, 2025. Implemented QR code scanning and image upload capabilities
 - July 07, 2025. Added QR landing page as entry point with product ID flow
+- July 14, 2025. Added AI Call page with phone-like voice interface using OpenAI Whisper and TTS
 
 ## User Preferences
 

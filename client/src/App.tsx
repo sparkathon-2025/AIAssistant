@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Chat from "@/pages/chat";
 import QRLanding from "@/pages/qr-landing";
+import AICall from "@/pages/ai-call";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -13,6 +14,7 @@ function Router() {
     <Switch>
       <Route path="/" component={QRLanding} />
       <Route path="/chat" component={Chat} />
+      <Route path="/ai-call" component={AICall} />
       <Route component={NotFound} />
     </Switch>
   );

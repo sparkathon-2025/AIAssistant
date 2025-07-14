@@ -23,7 +23,7 @@ export const QRScanner = ({ onScanResult, onClose }: QRScannerProps) => {
     onScanResult(result);
     onClose();
   };
-  
+
   useEffect(() => {
     startScanning();
     return () => stopScanning();

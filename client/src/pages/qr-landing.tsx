@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { QRScanner } from '@/components/QRScanner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,10 +83,18 @@ export default function QRLanding() {
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
           
-          <div className="text-center">
+          <div className="text-center space-y-3">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Point your camera at a store QR code to get started
             </p>
+            <div className="flex gap-6 justify-center">
+              <Link href="/chat" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">
+                💬 Text Chat
+              </Link>
+              <Link href="/ai-call" className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium text-sm">
+                📞 AI Call
+              </Link>
+            </div>
           </div>
         </CardContent>
       </Card>
