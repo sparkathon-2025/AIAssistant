@@ -4,6 +4,8 @@
 
 This is a modern full-stack AI chat application built with React frontend and Express backend. The application allows users to have conversations with an AI assistant powered by OpenAI's GPT-4o model. It features a clean, responsive interface using shadcn/ui components and TailwindCSS for styling.
 
+Link: https://aia-ssistant.vercel.app/
+
 ## System Architecture
 
 ### Frontend Architecture
